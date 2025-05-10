@@ -52,12 +52,12 @@ FinWise is a comprehensive personal finance web application designed to help use
 
 1. Clone the repository:
 
-   ````bash
+   ```bash
    git clone https://github.com/Odumz/finwise-frontend.git
    cd finwise-frontend
-   ```bash
 
-   ````
+
+   ```
 
 2. Install dependencies:
 
