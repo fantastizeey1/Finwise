@@ -1,16 +1,12 @@
 {
   "compilerOptions": {
     "composite": true,
-    "noEmit": false,
-    "target": "ES2022",
-    "lib": ["ES2022"],
+    "skipLibCheck": true,
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
-    "verbatimModuleSyntax": true,
-    "moduleDetection": "force",
-    "strict": true,
-    "forceConsistentCasingInFileNames": true
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true
   },
   "include": ["vite.config.ts"]
 }
