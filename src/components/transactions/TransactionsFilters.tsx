@@ -31,6 +31,15 @@ type TransactionsFiltersProps = {
   onFilterChange?: (filtered: Transaction[]) => void;
 };
 
+// Helper function to properly compare dates - moved outside component
+const compareDates = (date1: Date, date2: Date): boolean => {
+  return (
+    date1.getFullYear() === date2.getFullYear() &&
+    date1.getMonth() === date2.getMonth() &&
+    date1.getDate() === date2.getDate()
+  );
+};
+
 const TransactionsFilters = ({ transactions, onFilterChange }: TransactionsFiltersProps) => {
   const dispatch: AppDispatch = useDispatch();
   const { activeTab, selectedDate } = useSelector((state: RootState) => state.filters);
@@ -43,9 +52,6 @@ const TransactionsFilters = ({ transactions, onFilterChange }: TransactionsFilte
   const categories = [...new Set(transactions.map(tx => tx.category))].sort();
   const accounts = [...new Set(transactions.map(tx => tx.account))].sort();
 
-  // Helper function to properly compare dates
-  // (Removed duplicate declaration)
-
   // Filter transactions based on active tab and additional filters
   const filteredTransactions = transactions.filter(tx => {
     // Tab filter
@@ -54,8 +60,9 @@ const TransactionsFilters = ({ transactions, onFilterChange }: TransactionsFilte
       (activeTab === 'expenses' && tx.amount < 0) ||
       (activeTab === 'income' && tx.amount > 0);
 
-    // Date filter - convert string date from Redux to Date object for comparison
-    const dateMatch = !selectedDate || compareDates(new Date(tx.date), new Date(selectedDate));
+    // Date filter - using the date as string to avoid serialization issues
+    const dateMatch =
+      !selectedDate || (selectedDate && compareDates(new Date(tx.date), new Date(selectedDate)));
 
     // Category filter
     const categoryMatch = !filterCategory || tx.category === filterCategory;
@@ -65,15 +72,6 @@ const TransactionsFilters = ({ transactions, onFilterChange }: TransactionsFilte
 
     return tabMatch && dateMatch && categoryMatch && accountMatch;
   });
-
-  // Helper function to properly compare dates
-  const compareDates = (date1: Date, date2: Date): boolean => {
-    return (
-      date1.getFullYear() === date2.getFullYear() &&
-      date1.getMonth() === date2.getMonth() &&
-      date1.getDate() === date2.getDate()
-    );
-  };
 
   // Notify parent component when filters change
   useEffect(() => {
@@ -106,6 +104,15 @@ const TransactionsFilters = ({ transactions, onFilterChange }: TransactionsFilte
     dispatch(resetFilters());
     setFilterCategory(null);
     setFilterAccount(null);
+  };
+
+  // Fix the serialization issue by explicitly handling the date selection
+  const handleDateSelect = (date: Date | undefined) => {
+    if (date) {
+      dispatch(setSelectedDate(date));
+    } else {
+      dispatch(setSelectedDate(null));
+    }
   };
 
   const activeFiltersCount = [
@@ -156,7 +163,7 @@ const TransactionsFilters = ({ transactions, onFilterChange }: TransactionsFilte
               <Calendar
                 mode="single"
                 selected={selectedDate ? new Date(selectedDate) : undefined}
-                onSelect={date => dispatch(setSelectedDate(date ?? null))}
+                onSelect={handleDateSelect}
                 className="rounded-md"
               />
             </PopoverContent>
